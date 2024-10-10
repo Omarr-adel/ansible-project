@@ -1,0 +1,19 @@
+upstream apache_servers {
+    server 10.0.2.84;  # Replace with the actual private IPs of your Apache servers
+    server 10.0.2.17;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://internal-private-alb-559464075.us-east-1.elb.amazonaws.com;
+        proxy_set_header Host $host;  # Preserve the original Host header
+        proxy_set_header X-Real-IP $remote_addr;  # Forward the real client IP
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  # For tracking the original IP
+        proxy_set_header X-Forwarded-Proto $scheme;  # Forward the original protocol
+    }
+}
+
+
+

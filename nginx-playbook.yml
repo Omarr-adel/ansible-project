@@ -1,0 +1,32 @@
+---
+- name: Configure Nginx as a reverse proxy
+  hosts: nginx_servers
+  become: true
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Copy Nginx proxy configuration template
+      template:
+        src: proxy.conf.j2  # Replace with your local path to proxy.conf.j2
+        dest: /etc/nginx/conf.d/proxy.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Test Nginx configuration
+      command: nginx -t
+      register: nginx_test_result  # Register the result of the nginx -t command
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+      when: nginx_test_result.rc == 0  # Use the registered variable to check if nginx -t passed
+
+
+
+
